@@ -927,10 +927,13 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                         ),
                         IconButton(
                           onPressed: () {
-                            player.setPlaybackSpeed(
-                                player.value.playbackSpeed - 0.1);
-                            widget.callbackOptions.onChangedPlaybackSpeed
-                                ?.call(player.value.playbackSpeed - 0.1);
+                            if (player.value.playbackSpeed > 0.1) {
+                              player.setPlaybackSpeed(
+                                  player.value.playbackSpeed - 0.1);
+                              widget.callbackOptions.onChangedPlaybackSpeed
+                                  ?.call(player.value.playbackSpeed - 0.1);
+                              setState(() {});
+                            }
                           },
                           icon: const Icon(
                             Icons.remove,
