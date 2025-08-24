@@ -36,12 +36,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_vlc_player: 2e318881576450ff081eb023d47c289f2c6681eb
+  flutter_vlc_player: 131db3e1b20078ed3980c9ed641c63df591d3f72
   MobileVLCKit: 2d9c7c373393ae43086aeeff890bf0b1afc15c5c
-  package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
-  screen_brightness_ios: 7437207a2a9bc56553aa10f782afecf830b4c4e2
-  wakelock_plus: 78ec7c5b202cab7761af8e2b2b3d0671be6c4ae1
+  package_info_plus: 580e9a5f1b6ca5594e7c9ed5f92d1dfb2a66b5e1
+  screen_brightness_ios: 28c5fbdb40634de44f86025d84470158ad4df48c
+  wakelock_plus: fd58c82b1388f4afe3fe8aa2c856503a262a5b03
 
-PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
