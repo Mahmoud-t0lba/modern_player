@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:modern_player/modern_player.dart';
 import 'package:modern_player/src/modern_player_options.dart';
-import 'package:modern_player/src/others/modern_player_utils.dart';
+import 'package:modern_player/src/modern_player_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-import 'widgets/modern_player_menus.dart';
+import 'modern_player_menus.dart';
 
 class ModernPlayerControls extends StatefulWidget {
   const ModernPlayerControls(

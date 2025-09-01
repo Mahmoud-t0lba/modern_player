@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:modern_player/src/modern_player_controls.dart';
 import 'package:modern_player/src/modern_player_options.dart';
-import 'package:modern_player/src/others/modern_players_enums.dart';
+import 'package:modern_player/src/modern_players_enums.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -111,9 +111,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
   void _setPlayer() async {
     ModernPlayerVideoData defaultSource = videosData.length > 1
         ? _getDefaultTrackSource(
-                selectors:
-                    widget.defaultSelectionOptions?.defaultQualitySelectors,
-                trackEntries: videosData) ??
+                selectors: widget.defaultSelectionOptions?.defaultQualitySelectors, trackEntries: videosData) ??
             videosData.first
         : videosData.first;
 
@@ -126,36 +124,30 @@ class _ModernPlayerState extends State<ModernPlayer> {
           autoInitialize: true,
           hwAcc: HwAcc.auto,
           options: VlcPlayerOptions(
-            subtitle: VlcSubtitleOptions(
-                [VlcSubtitleOptions.color(VlcSubtitleColor.white)]),
+            subtitle: VlcSubtitleOptions([VlcSubtitleOptions.color(VlcSubtitleColor.white)]),
           ));
     }
     // File
     else if (defaultSource.sourceType == ModernPlayerSourceType.file) {
-      _playerController = VlcPlayerController.file(File(defaultSource.source),
-          autoPlay: true, autoInitialize: true, hwAcc: HwAcc.auto);
+      _playerController =
+          VlcPlayerController.file(File(defaultSource.source), autoPlay: true, autoInitialize: true, hwAcc: HwAcc.auto);
     }
     // Youtube
     else if (defaultSource.sourceType == ModernPlayerSourceType.youtube) {
       var yt = YoutubeExplode();
       youtubeId = defaultSource.source;
-      StreamManifest manifest =
-          await yt.videos.streamsClient.getManifest(youtubeId);
+      StreamManifest manifest = await yt.videos.streamsClient.getManifest(youtubeId);
 
       if (widget.video.fetchQualities ?? false) {
         List<ModernPlayerVideoData> ytVideos = List.empty(growable: true);
 
         for (var element in manifest.videoOnly) {
-          ModernPlayerVideoData videoData =
-              ModernPlayerVideoDataYoutube.network(
-                  label: element.qualityLabel,
-                  url: element.url.toString(),
-                  audioOverride:
-                      manifest.audioOnly.withHighestBitrate().url.toString());
+          ModernPlayerVideoData videoData = ModernPlayerVideoDataYoutube.network(
+              label: element.qualityLabel,
+              url: element.url.toString(),
+              audioOverride: manifest.audioOnly.withHighestBitrate().url.toString());
 
-          if (ytVideos
-              .where((element) => element.label == videoData.label)
-              .isEmpty) {
+          if (ytVideos.where((element) => element.label == videoData.label).isEmpty) {
             ytVideos.insert(0, videoData);
           }
         }
@@ -167,30 +159,23 @@ class _ModernPlayerState extends State<ModernPlayer> {
             sourceType: ModernPlayerAudioSourceType.network));
 
         ModernPlayerVideoData? defaultSourceYt = _getDefaultTrackSource(
-            selectors: widget.defaultSelectionOptions?.defaultQualitySelectors,
-            trackEntries: ytVideos);
+            selectors: widget.defaultSelectionOptions?.defaultQualitySelectors, trackEntries: ytVideos);
 
         selectedQuality = defaultSourceYt ?? defaultSource;
 
-        _playerController = VlcPlayerController.network(
-            defaultSourceYt?.source ?? ytVideos.first.source,
-            autoPlay: true,
-            autoInitialize: true,
-            hwAcc: HwAcc.auto);
+        _playerController = VlcPlayerController.network(defaultSourceYt?.source ?? ytVideos.first.source,
+            autoPlay: true, autoInitialize: true, hwAcc: HwAcc.auto);
       } else {
-        _playerController = VlcPlayerController.network(
-            manifest.muxed.withHighestBitrate().url.toString(),
-            autoPlay: true,
-            autoInitialize: true,
-            hwAcc: HwAcc.auto);
+        _playerController = VlcPlayerController.network(manifest.muxed.withHighestBitrate().url.toString(),
+            autoPlay: true, autoInitialize: true, hwAcc: HwAcc.auto);
       }
 
       yt.close();
     }
     // Asset
     else {
-      _playerController = VlcPlayerController.asset(defaultSource.source,
-          autoPlay: true, autoInitialize: true, hwAcc: HwAcc.full);
+      _playerController =
+          VlcPlayerController.asset(defaultSource.source, autoPlay: true, autoInitialize: true, hwAcc: HwAcc.full);
     }
 
     _playerController.addOnInitListener(_onInitialize);
@@ -203,8 +188,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
 
   /// Helper function to set default track for subtitle, audio, etc
   ModernPlayerVideoData? _getDefaultTrackSource(
-      {required List<DefaultSelector>? selectors,
-      required List<ModernPlayerVideoData>? trackEntries}) {
+      {required List<DefaultSelector>? selectors, required List<ModernPlayerVideoData>? trackEntries}) {
     if (selectors == null || trackEntries == null || trackEntries.isEmpty) {
       return null;
     }
@@ -243,8 +227,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
         await Future.delayed(const Duration(milliseconds: 100));
       } while (_playerController.value.playingState != PlayingState.playing);
 
-      await _playerController
-          .seekTo(Duration(milliseconds: widget.options!.videoStartAt!));
+      await _playerController.seekTo(Duration(milliseconds: widget.options!.videoStartAt!));
     }
   }
 
@@ -252,14 +235,12 @@ class _ModernPlayerState extends State<ModernPlayer> {
     for (var subtitle in widget.subtitles) {
       if (subtitle.sourceType == ModernPlayerSubtitleSourceType.file) {
         if (await File(subtitle.source).exists()) {
-          _playerController.addSubtitleFromFile(File(subtitle.source),
-              isSelected: subtitle.isSelected);
+          _playerController.addSubtitleFromFile(File(subtitle.source), isSelected: subtitle.isSelected);
         } else {
           throw Exception("${subtitle.source} is not exist in local file.");
         }
       } else {
-        _playerController.addSubtitleFromNetwork(subtitle.source,
-            isSelected: subtitle.isSelected);
+        _playerController.addSubtitleFromNetwork(subtitle.source, isSelected: subtitle.isSelected);
       }
     }
   }
@@ -268,14 +249,12 @@ class _ModernPlayerState extends State<ModernPlayer> {
     for (var audio in widget.audioTracks) {
       if (audio.sourceType == ModernPlayerAudioSourceType.file) {
         if (await File(audio.source).exists()) {
-          _playerController.addAudioFromFile(File(audio.source),
-              isSelected: audio.isSelected);
+          _playerController.addAudioFromFile(File(audio.source), isSelected: audio.isSelected);
         } else {
           throw Exception("${audio.source} is not exist in local file.");
         }
       } else {
-        _playerController.addAudioFromNetwork(audio.source,
-            isSelected: audio.isSelected);
+        _playerController.addAudioFromNetwork(audio.source, isSelected: audio.isSelected);
       }
     }
   }
@@ -344,18 +323,12 @@ class _ModernPlayerState extends State<ModernPlayer> {
                 ModernPlayerControls(
                   player: _playerController,
                   videos: videosData,
-                  controlsOptions:
-                      widget.controlsOptions ?? ModernPlayerControlsOptions(),
-                  defaultSelectionOptions: widget.defaultSelectionOptions ??
-                      ModernPlayerDefaultSelectionOptions(),
-                  themeOptions:
-                      widget.themeOptions ?? ModernPlayerThemeOptions(),
-                  translationOptions: widget.translationOptions ??
-                      ModernPlayerTranslationOptions.menu(),
-                  viewSize: Size(MediaQuery.of(context).size.width,
-                      MediaQuery.of(context).size.height),
-                  callbackOptions:
-                      widget.callbackOptions ?? ModernPlayerCallbackOptions(),
+                  controlsOptions: widget.controlsOptions ?? ModernPlayerControlsOptions(),
+                  defaultSelectionOptions: widget.defaultSelectionOptions ?? ModernPlayerDefaultSelectionOptions(),
+                  themeOptions: widget.themeOptions ?? ModernPlayerThemeOptions(),
+                  translationOptions: widget.translationOptions ?? ModernPlayerTranslationOptions.menu(),
+                  viewSize: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                  callbackOptions: widget.callbackOptions ?? ModernPlayerCallbackOptions(),
                   selectedQuality: selectedQuality,
                 )
             ],
@@ -366,8 +339,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
               width: 50,
               child: widget.themeOptions?.customLoadingWidget ??
                   CircularProgressIndicator(
-                    color:
-                        widget.themeOptions?.loadingColor ?? Colors.greenAccent,
+                    color: widget.themeOptions?.loadingColor ?? Colors.greenAccent,
                     strokeCap: StrokeCap.round,
                   ),
             ),

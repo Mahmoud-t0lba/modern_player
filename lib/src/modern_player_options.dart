@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:modern_player/src/others/modern_players_enums.dart';
+import 'package:modern_player/src/modern_players_enums.dart';
 
 /// [ModernPlayerVideo] has multiple type of player.
 /// Enhance your video playback experience with modern_player.
@@ -60,8 +60,7 @@ class ModernPlayerVideo {
   ///       sourceType: ModernPlayerSourceType.youtube),
   /// )
   /// ```
-  ModernPlayerVideo.single(
-      {required String source, required ModernPlayerSourceType sourceType}) {
+  ModernPlayerVideo.single({required String source, required ModernPlayerSourceType sourceType}) {
     late ModernPlayerVideoData videoData;
 
     switch (sourceType) {
@@ -83,8 +82,7 @@ class ModernPlayerVideo {
               );
         break;
       default:
-        videoData =
-            ModernPlayerVideoData.network(label: 'Default', url: source);
+        videoData = ModernPlayerVideoData.network(label: 'Default', url: source);
         break;
     }
 
@@ -100,9 +98,7 @@ class ModernPlayerVideo {
   /// It has an additional feature [fetchQualities], which can get different video quality/resoltuion
   /// from youtube and allow user to switch between those.
   ModernPlayerVideo.youtubeWithId({required String id, this.fetchQualities}) {
-    videosData = [
-      ModernPlayerVideoData.youtubeWithId(label: "Default", id: id)
-    ];
+    videosData = [ModernPlayerVideoData.youtubeWithId(label: "Default", id: id)];
   }
 
   /// [ModernPlayerVideo.youtubeWithUrl] allow you to create a video player with youtube video url.
@@ -110,9 +106,7 @@ class ModernPlayerVideo {
   /// It has an additional feature [fetchQualities], which can get different video quality/resoltuion
   /// from youtube and allow user to switch between those.
   ModernPlayerVideo.youtubeWithUrl({required String url, this.fetchQualities}) {
-    videosData = [
-      ModernPlayerVideoData.youtubeWithUrl(label: "Default", url: url)
-    ];
+    videosData = [ModernPlayerVideoData.youtubeWithUrl(label: "Default", url: url)];
   }
 }
 
@@ -153,8 +147,7 @@ class ModernPlayerVideoData {
   ///
   ///The url of the youtube video is given by the [url] argument and must not be null.
   ///And the [label] is displayed on quality selection on menu.
-  ModernPlayerVideoData.youtubeWithUrl(
-      {required this.label, required String url}) {
+  ModernPlayerVideoData.youtubeWithUrl({required this.label, required String url}) {
     String? videoId = _youtubeParser(url);
 
     if (videoId == null) {
@@ -169,8 +162,7 @@ class ModernPlayerVideoData {
   ///
   ///The Id of the youtube video is given by the [id] argument and must not be null.
   ///And the [label] is displayed on quality selection on menu.
-  ModernPlayerVideoData.youtubeWithId(
-      {required this.label, required String id}) {
+  ModernPlayerVideoData.youtubeWithId({required this.label, required String id}) {
     source = id;
     sourceType = ModernPlayerSourceType.youtube;
   }
@@ -186,12 +178,9 @@ class ModernPlayerVideoData {
 
   // Get youtube video id from url
   String? _youtubeParser(String url) {
-    final regExp = RegExp(
-        r'^.*((youtu.be/)|(v/)|(\/u/\w/)|(embed/)|(watch\?))\??v?=?([^#&?]*).*');
+    final regExp = RegExp(r'^.*((youtu.be/)|(v/)|(\/u/\w/)|(embed/)|(watch\?))\??v?=?([^#&?]*).*');
     final match = regExp.firstMatch(url);
-    return (match != null && match.group(7)!.length == 11)
-        ? match.group(7)
-        : null;
+    return (match != null && match.group(7)!.length == 11) ? match.group(7) : null;
   }
 }
 
@@ -200,8 +189,7 @@ class ModernPlayerVideoDataYoutube extends ModernPlayerVideoData {
   /// Url of audio for override [For youtube obly]
   String? audioOverride;
 
-  ModernPlayerVideoDataYoutube.network(
-      {required super.label, required super.url, required this.audioOverride})
+  ModernPlayerVideoDataYoutube.network({required super.label, required super.url, required this.audioOverride})
       : super.network();
 }
 
@@ -216,10 +204,7 @@ class ModernPlayerOptions {
   /// When enabled, screen can go on sleep during the video is playing
   bool? allowScreenSleep;
 
-  ModernPlayerOptions(
-      {this.autoVisibilityPause = true,
-      this.videoStartAt,
-      this.allowScreenSleep});
+  ModernPlayerOptions({this.autoVisibilityPause = true, this.videoStartAt, this.allowScreenSleep});
 }
 
 /// Controls option for Modern Player
@@ -394,8 +379,7 @@ class ModernPlayerCustomActionButton {
   /// You received a callback whenever user long press this button.
   VoidCallback? onDoubleTap;
 
-  ModernPlayerCustomActionButton(
-      {required this.icon, this.onPressed, this.onDoubleTap, this.onLongPress});
+  ModernPlayerCustomActionButton({required this.icon, this.onPressed, this.onDoubleTap, this.onLongPress});
 }
 
 /// The top level type which defines the strategies for selecting tracks
@@ -426,8 +410,7 @@ class DefaultSelectorCustom extends DefaultSelector {
 /// ```
 class DefaultSelectorLabel extends DefaultSelectorCustom {
   DefaultSelectorLabel(String labelSubstring)
-      : super((index, label) =>
-            label.toLowerCase().contains(labelSubstring.toLowerCase()));
+      : super((index, label) => label.toLowerCase().contains(labelSubstring.toLowerCase()));
 }
 
 /// [ModernPlayerDefaultSelectionOptions] provides you ability to select default subtitle, audio and video quality.
@@ -437,9 +420,7 @@ class ModernPlayerDefaultSelectionOptions {
   List<DefaultSelector>? defaultQualitySelectors;
 
   ModernPlayerDefaultSelectionOptions(
-      {this.defaultSubtitleSelectors,
-      this.defaultAudioSelectors,
-      this.defaultQualitySelectors});
+      {this.defaultSubtitleSelectors, this.defaultAudioSelectors, this.defaultQualitySelectors});
 }
 
 /// Subtitle Option for Modern Player
@@ -459,8 +440,7 @@ class ModernPlayerSubtitleOptions {
   /// When enables, it gets selected when added
   bool? isSelected;
 
-  ModernPlayerSubtitleOptions(
-      {required this.source, required this.sourceType, this.isSelected});
+  ModernPlayerSubtitleOptions({required this.source, required this.sourceType, this.isSelected});
 }
 
 /// Audio Option for Modern Player
@@ -480,8 +460,7 @@ class ModernPlayerAudioTrackOptions {
   /// When enables, it gets selected when added
   bool? isSelected;
 
-  ModernPlayerAudioTrackOptions(
-      {required this.source, required this.sourceType, this.isSelected});
+  ModernPlayerAudioTrackOptions({required this.source, required this.sourceType, this.isSelected});
 }
 
 /// Translation Option for Modern Player
