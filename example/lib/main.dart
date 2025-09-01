@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:modern_player/modern_player.dart';
+import 'package:modern_player/modern_player_imports.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,15 +40,13 @@ class _MyHomePageState extends State<MyHomePage> {
         Icons.settings,
         color: Colors.white,
       ),
-      volumeSlidertheme: ModernPlayerToastSliderThemeOption(
-          sliderColor: Colors.blue, iconColor: Colors.white),
+      volumeSlidertheme: ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue, iconColor: Colors.white),
       progressSliderTheme: ModernPlayerProgressSliderTheme(
           activeSliderColor: Colors.blue,
           inactiveSliderColor: Colors.white70,
           bufferSliderColor: Colors.black54,
           thumbColor: Colors.white,
-          progressTextStyle: const TextStyle(
-              fontWeight: FontWeight.w400, color: Colors.white, fontSize: 18)));
+          progressTextStyle: const TextStyle(fontWeight: FontWeight.w400, color: Colors.white, fontSize: 18)));
 
   // Controls option for modern_player
   var controlsOptions = ModernPlayerControlsOptions(
@@ -86,12 +84,10 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 250,
               child: ModernPlayer.createPlayer(
-                defaultSelectionOptions: ModernPlayerDefaultSelectionOptions(
-                    defaultQualitySelectors: [DefaultSelectorLabel('360p')]),
+                defaultSelectionOptions:
+                    ModernPlayerDefaultSelectionOptions(defaultQualitySelectors: [DefaultSelectorLabel('360p')]),
                 video: ModernPlayerVideo.youtubeWithUrl(
-                    url:
-                        'https://www.youtube.com/watch?v=vEHeI_wBzu0&ab_channel=UntitledStudio',
-                    fetchQualities: true),
+                    url: 'https://www.youtube.com/watch?v=vEHeI_wBzu0&ab_channel=UntitledStudio', fetchQualities: true),
               ),
             )
           ],

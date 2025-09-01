@@ -4,12 +4,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
-import 'package:modern_player/modern_player.dart';
-import 'package:modern_player/src/modern_player_options.dart';
-import 'package:modern_player/src/modern_player_utils.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
+import '../modern_player_imports.dart';
 import 'modern_player_menus.dart';
 
 class ModernPlayerControls extends StatefulWidget {
@@ -61,22 +59,16 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
   late StreamController<double> _valController;
   late ModernPlayerVideoData _currentVideoData;
 
-  /// Auto hide controls timer
   Timer? _hideTimer;
 
-  /// Check controls is hidden or not
   bool _hideStuff = true;
 
-  /// Offline seek position
   int _seekPos = 0;
 
-  /// List of audio tracks
   Map<int, String>? _audioTracks;
 
-  /// List of subtitle tracks
   Map<int, String>? _subtitleTracks;
 
-  /// List of playback speeds
   final List<double> _playbackSpeeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2];
 
   List<ModernPlayerCustomActionButton> _customActionButtons = [];
@@ -95,7 +87,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     super.initState();
   }
 
-  /// Add listners
   void _listen() async {
     if (!_isDisposed) {
       if (_hideStuff == false) {
@@ -125,9 +116,7 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     }
   }
 
-  /// Get audio and subtitle tracks
   void _getTracks() async {
-    // Run in parallel - they don't depend on each other.
     final tracksFutures = Future.wait([
       player.getAudioTracks(),
       player.getSpuTracks(),
@@ -143,7 +132,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     ]);
   }
 
-  /// Helper function to set default track for subtitle, audio, etc
   Future<void> _setDefaultTrack(
       {required List<DefaultSelector>? selectors,
       required Map<int, String>? trackEntries,
@@ -166,7 +154,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
           if (defaultIndex != null) {
             setTrackFunction(defaultIndex);
             return;
-            // Else, if no track is found, loop to the next selector
           }
         case DefaultSelectorOff():
           setTrackFunction(-1);
@@ -175,7 +162,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     }
   }
 
-  /// Set default subtitle track
   Future<void> _setDefaultSubtitleTrack(Map<int, String>? tracks) async {
     await _setDefaultTrack(
       selectors: widget.defaultSelectionOptions.defaultSubtitleSelectors,
@@ -184,7 +170,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     );
   }
 
-  /// Set default audio track
   Future<void> _setDefaultAudioTrack(Map<int, String>? tracks) async {
     await _setDefaultTrack(
       selectors: widget.defaultSelectionOptions.defaultAudioSelectors,
@@ -193,7 +178,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     );
   }
 
-  /// Toggle between play and pause
   void _playOrPause() async {
     if (await player.isPlaying() ?? false) {
       setState(() {
@@ -301,19 +285,8 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
 
     widget.callbackOptions.onChangedQuality?.call(videoData.label, videoData.source);
 
-    // Refresh subtitle and audio tracks
     _getTracks();
   }
-
-  // void _changeSubtitleTrack(MapEntry subtitle) async {
-  //   await player.setSpuTrack(subtitle.key);
-  //   widget.callbackOptions.onChangedSubtitle?.call(subtitle.key);
-  // }
-
-  // void _changeAudioTrack(MapEntry subtitle) async {
-  //   await player.setAudioTrack(subtitle.key);
-  //   widget.callbackOptions.onChangedAudio?.call(subtitle.key);
-  // }
 
   void _seekTo(Duration position) async {
     await player.pause().then((value) async {
@@ -398,7 +371,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
     _dragRight = false;
 
     if (d.localPosition.dx > (widget.viewSize.width / 3 + (widget.viewSize.width / 3))) {
-      // right, volume
       if (widget.controlsOptions.enableVolumeSlider) {
         _dragRight = true;
         double volume = _volume ?? (player.value.volume / 100).toDouble();
@@ -409,7 +381,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
         });
       }
     } else if (d.localPosition.dx < widget.viewSize.width / 3) {
-      // left, brightness
       if (widget.controlsOptions.enableBrightnessSlider) {
         _dragLeft = true;
         ScreenBrightness().current.then((v) {
@@ -492,7 +463,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                             Row(
                               children: [
                                 if (widget.controlsOptions.showBackbutton)
-                                  // Back Button
                                   SizedBox(
                                     height: 50,
                                     width: 50,
@@ -512,7 +482,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                                     ),
                                   ),
                                 const Spacer(),
-                                // Custom Buttons
                                 ..._customActionButtons.map(
                                   (e) => SizedBox(
                                     height: 50,
@@ -541,7 +510,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                                     ),
                                   ),
                                 ),
-                                // Mute/Unmute
                                 if (widget.controlsOptions.showMute)
                                   SizedBox(
                                     height: 50,
@@ -577,7 +545,6 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                                       ),
                                     ),
                                   ),
-                                // Settings/Menu
                                 if (widget.controlsOptions.showMenu)
                                   SizedBox(
                                     height: 50,
@@ -621,27 +588,28 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                     child: Stack(
                       children: [
                         Positioned.fill(
-                            child: (_slidingValue != null)
-                                ? IgnorePointer(
-                                    child: _brightness != null
-                                        ? _VideoControlsSliderToast(
-                                            _brightness!,
-                                            1,
-                                            _valController.stream,
-                                            widget.themeOptions.brightnessSlidertheme ??
-                                                ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue),
-                                            widget.themeOptions.volumeSlidertheme ??
-                                                ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue))
-                                        : _VideoControlsSliderToast(
-                                            _volume!,
-                                            0,
-                                            _valController.stream,
-                                            widget.themeOptions.brightnessSlidertheme ??
-                                                ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue),
-                                            widget.themeOptions.volumeSlidertheme ??
-                                                ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue)),
-                                  )
-                                : const SizedBox.shrink())
+                          child: (_slidingValue != null)
+                              ? IgnorePointer(
+                                  child: _brightness != null
+                                      ? _VideoControlsSliderToast(
+                                          _brightness!,
+                                          1,
+                                          _valController.stream,
+                                          widget.themeOptions.brightnessSlidertheme ??
+                                              ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue),
+                                          widget.themeOptions.volumeSlidertheme ??
+                                              ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue))
+                                      : _VideoControlsSliderToast(
+                                          _volume!,
+                                          0,
+                                          _valController.stream,
+                                          widget.themeOptions.brightnessSlidertheme ??
+                                              ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue),
+                                          widget.themeOptions.volumeSlidertheme ??
+                                              ModernPlayerToastSliderThemeOption(sliderColor: Colors.blue)),
+                                )
+                              : const SizedBox.shrink(),
+                        )
                       ],
                     ),
                   ),
@@ -727,17 +695,13 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                 color: Colors.white,
               ),
             ),
-            const SizedBox(
-              width: 5,
-            ),
+            const SizedBox(width: 5),
             Text(
-              getFormattedDuration(_seekPos > 0 ? Duration(seconds: _seekPos) : _currentPos),
+              _getFormattedDuration(_seekPos > 0 ? Duration(seconds: _seekPos) : _currentPos),
               style: widget.themeOptions.progressSliderTheme?.progressTextStyle ??
                   const TextStyle(color: Colors.white, fontSize: 12),
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             Expanded(
                 child: SliderTheme(
               data: SliderThemeData(
@@ -762,25 +726,26 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                 },
               ),
             )),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             Text(
-              "-${getFormattedDuration(_seekPos > 0 ? Duration(seconds: duration - _seekPos) : remaining)}",
+              '-${_getFormattedDuration(_seekPos > 0 ? Duration(seconds: duration - _seekPos) : remaining)}',
               style: widget.themeOptions.progressSliderTheme?.progressTextStyle ??
                   const TextStyle(color: Colors.white, fontSize: 12),
             ),
-            const SizedBox(
-              width: 5,
-            ),
+            const SizedBox(width: 5),
           ],
         ),
       ),
     );
   }
 
+  String _getFormattedDuration(Duration duration) {
+    return "${duration.inHours > 0 ? "${(duration.inHours % 24).toString().padLeft(2, '0')}:" : ""}${(duration.inMinutes % 60).toString().padLeft(2, '0')}:${(duration.inSeconds % 60).toString().padLeft(2, '0')}";
+  }
+
   void showOptions(BuildContext context) {
     showModalBottomSheet(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       context: context,
       useSafeArea: true,
       showDragHandle: true,
@@ -806,9 +771,7 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                     Icons.settings_outlined,
                     color: Colors.white,
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  const SizedBox(width: 20),
                   Text(
                     "${translationOptions.qualityHeaderText ?? "Quality"}  ◉  ",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
@@ -826,7 +789,7 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                 Navigator.pop(context);
                 ModernPlayerMenus().showPlabackSpeedOptions(context,
                     menuColor: getMenuBackgroundColor(),
-                    text: translationOptions.defaultPlaybackSpeedText ?? "Normal",
+                    text: translationOptions.defaultPlaybackSpeedText ?? 'Normal',
                     currentSpeed: player.value.playbackSpeed,
                     allSpeeds: _playbackSpeeds, onChnagedSpeed: (speed) {
                   player.setPlaybackSpeed(speed);
@@ -839,182 +802,33 @@ class _ModernPlayerControlsState extends State<ModernPlayerControls> {
                     Icons.speed_rounded,
                     color: Colors.white,
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
+                  const SizedBox(width: 20),
                   Text(
                     "${translationOptions.playbackSpeedText ?? "Plaback speed"}  ◉  ",
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                   Text(
                     player.value.playbackSpeed == 1
-                        ? translationOptions.defaultPlaybackSpeedText ?? "Normal"
-                        : "${player.value.playbackSpeed.toStringAsFixed(2)}x",
+                        ? translationOptions.defaultPlaybackSpeedText ?? 'Normal'
+                        : '${player.value.playbackSpeed.toStringAsFixed(2)}x',
                     style: const TextStyle(color: Colors.white60, fontSize: 16),
                   )
                 ],
               ),
             ),
             const SizedBox(height: 40),
-            // _subtitleRowWidget(context),
-            // const SizedBox(height: 30),
-            // _audioRowWidget(context),
-            // const SizedBox(height: 10),
           ],
         ),
       ),
     );
   }
 
-  // Widget _subtitleRowWidget(BuildContext context) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       if (_subtitleTracks != null) {
-  //         if (_subtitleTracks!.entries.isNotEmpty) {
-  //           Navigator.pop(context);
-  //           ModernPlayerMenus().showSubtitleOptions(context,
-  //               menuColor: getMenuBackgroundColor(),
-  //               activeTrack: player.value.activeSpuTrack,
-  //               allTracks: _subtitleTracks!,
-  //               onChangedSubtitle: _changeSubtitleTrack);
-  //         }
-  //       }
-  //     },
-  //     child: _subtitleTracks != null
-  //         ? _subtitleTracks!.entries.isNotEmpty
-  //             ? Row(
-  //                 children: [
-  //                   const Icon(
-  //                     Icons.closed_caption_outlined,
-  //                     color: Colors.white,
-  //                   ),
-  //                   const SizedBox(
-  //                     width: 20,
-  //                   ),
-  //                   Text(
-  //                     "${translationOptions.subtitleText ?? "Subtitles"}  ◉  ",
-  //                     style: const TextStyle(color: Colors.white, fontSize: 16),
-  //                   ),
-  //                   Text(
-  //                     _subtitleTracks!.entries.isNotEmpty
-  //                         ? _subtitleTracks![player.value.activeSpuTrack] ??
-  //                             translationOptions.noneSubtitleText ??
-  //                             "None"
-  //                         : translationOptions.unavailableSubtitleText ??
-  //                             "Unavailable",
-  //                     style:
-  //                         const TextStyle(color: Colors.white60, fontSize: 16),
-  //                   )
-  //                 ],
-  //               )
-  //             : Row(
-  //                 children: [
-  //                   const Icon(
-  //                     Icons.closed_caption_outlined,
-  //                     color: Colors.white38,
-  //                   ),
-  //                   const SizedBox(
-  //                     width: 20,
-  //                   ),
-  //                   Text(
-  //                     "${translationOptions.subtitleText ?? "Subtitles"}  ◉  ",
-  //                     style:
-  //                         const TextStyle(color: Colors.white38, fontSize: 16),
-  //                   ),
-  //                   Text(
-  //                     translationOptions.unavailableSubtitleText ??
-  //                         "Unavailable",
-  //                     style:
-  //                         const TextStyle(color: Colors.white38, fontSize: 16),
-  //                   )
-  //                 ],
-  //               )
-  //         : Row(
-  //             children: [
-  //               const Icon(
-  //                 Icons.closed_caption_outlined,
-  //                 color: Colors.white38,
-  //               ),
-  //               const SizedBox(
-  //                 width: 20,
-  //               ),
-  //               Text(
-  //                 "${translationOptions.subtitleText ?? "Subtitles"}  ◉  ",
-  //                 style: const TextStyle(color: Colors.white38, fontSize: 16),
-  //               ),
-  //               Text(
-  //                 translationOptions.unavailableSubtitleText ?? "Unavailable",
-  //                 style: const TextStyle(color: Colors.white38, fontSize: 16),
-  //               )
-  //             ],
-  //           ),
-  //   );
-  // }
-
-  // Widget _audioRowWidget(BuildContext context) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       if (_audioTracks != null) {
-  //         if (_audioTracks![player.value.activeAudioTrack] != null) {
-  //           Navigator.pop(context);
-  //           ModernPlayerMenus().showAudioOptions(context,
-  //               menuColor: getMenuBackgroundColor(),
-  //               activeTrack: player.value.activeAudioTrack,
-  //               allTracks: _audioTracks!,
-  //               onChangedAudio: _changeAudioTrack);
-  //         }
-  //       }
-  //     },
-  //     child: _audioTracks![player.value.activeAudioTrack] != null
-  //         ? Row(
-  //             children: [
-  //               const Icon(
-  //                 Icons.speaker_group_outlined,
-  //                 color: Colors.white,
-  //               ),
-  //               const SizedBox(
-  //                 width: 20,
-  //               ),
-  //               Text(
-  //                 "${translationOptions.audioHeaderText ?? "Audio"}  ◉  ",
-  //                 style: const TextStyle(color: Colors.white, fontSize: 16),
-  //               ),
-  //               Text(
-  //                 _audioTracks == null
-  //                     ? translationOptions.loadingAudioText ?? "Loading"
-  //                     : _audioTracks![player.value.activeAudioTrack]!,
-  //                 style: const TextStyle(color: Colors.white60, fontSize: 16),
-  //               )
-  //             ],
-  //           )
-  //         : Row(
-  //             children: [
-  //               const Icon(
-  //                 Icons.closed_caption_outlined,
-  //                 color: Colors.white38,
-  //               ),
-  //               const SizedBox(
-  //                 width: 20,
-  //               ),
-  //               Text(
-  //                 "${translationOptions.audioHeaderText ?? "Audio"}  ◉  ",
-  //                 style: const TextStyle(color: Colors.white38, fontSize: 16),
-  //               ),
-  //               Text(
-  //                 translationOptions.unavailableAudioText ?? "Default",
-  //                 style: const TextStyle(color: Colors.white38, fontSize: 16),
-  //               )
-  //             ],
-  //           ),
-  //   );
-  // }
-
   Color getMenuBackgroundColor() {
     return widget.themeOptions.menuBackgroundColor ?? const Color.fromARGB(255, 20, 20, 20);
   }
 
   Color getIconsBackgroundColor() {
-    Color? color = widget.themeOptions.backgroundColor ?? Colors.black.withValues(alpha: 0.75);
+    Color? color = widget.themeOptions.backgroundColor ?? Colors.black.withValues(alpha: .75);
     return color;
   }
 }
@@ -1040,8 +854,6 @@ class _VideoControlsSliderToast extends StatefulWidget {
   final Stream<double> emitter;
   final double initial;
 
-  // type 0 volume
-  // type 1 screen brightness
   final int type;
   final ModernPlayerToastSliderThemeOption volumeSliderTheme;
   final ModernPlayerToastSliderThemeOption brightnessSliderTheme;
@@ -1079,7 +891,6 @@ class _VideoControlsSliderToastState extends State<_VideoControlsSliderToast> {
     final type = widget.type;
 
     if (type == 0) {
-      // Volume
       IconData iconData;
       if (value <= 0) {
         iconData = widget.volumeSliderTheme.unfilledIcon ?? Icons.volume_mute;
@@ -1092,7 +903,7 @@ class _VideoControlsSliderToastState extends State<_VideoControlsSliderToast> {
       return Align(
         alignment: const Alignment(0, -0.4),
         child: Card(
-          color: widget.volumeSliderTheme.backgroundColor ?? Colors.black.withValues(alpha: 0.5),
+          color: widget.volumeSliderTheme.backgroundColor ?? Colors.black.withValues(alpha: .5),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
             child: Row(
@@ -1120,7 +931,6 @@ class _VideoControlsSliderToastState extends State<_VideoControlsSliderToast> {
         ),
       );
     } else {
-      // Brightness
       IconData iconData;
       if (value <= 0) {
         iconData = widget.brightnessSliderTheme.unfilledIcon ?? Icons.brightness_low;
@@ -1133,7 +943,7 @@ class _VideoControlsSliderToastState extends State<_VideoControlsSliderToast> {
       return Align(
         alignment: const Alignment(0, -0.4),
         child: Card(
-          color: widget.brightnessSliderTheme.backgroundColor ?? Colors.black.withValues(alpha: 0.5),
+          color: widget.brightnessSliderTheme.backgroundColor ?? Colors.black.withValues(alpha: .5),
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
             child: Row(

@@ -1,20 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
-import 'package:modern_player/src/modern_player_controls.dart';
-import 'package:modern_player/src/modern_player_options.dart';
-import 'package:modern_player/src/modern_players_enums.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-/// Modern Player gives you a controller for flutter_vlc_player.
-///
-/// For displaying the video in Flutter, You can create video player widget by calling [createPlayer].
-///
-/// To customize video player controls or theme you can add [controlsOptions] and [themeOptions]
-/// when calling [createPlayer]
+import '../modern_player_imports.dart';
+import 'modern_player_controls.dart';
+import 'modern_player_menus.dart';
+
 class ModernPlayer extends StatefulWidget {
   const ModernPlayer._(
       {required this.video,
@@ -27,33 +23,22 @@ class ModernPlayer extends StatefulWidget {
       this.translationOptions,
       this.callbackOptions});
 
-  /// Video quality options for multiple qualities. If you have only one quality video just add one in list.
   final ModernPlayerVideo video;
 
-  /// Modern player can detect subtitle from the video on supported formats like .mkv.
-  ///
-  /// But if you wish to add subtitle from [file] or [network], you can use this [subtitles].
   final List<ModernPlayerSubtitleOptions> subtitles;
 
-  /// If you wish to add audio from [file] or [network], you can use this [audioTracks].
   final List<ModernPlayerAudioTrackOptions> audioTracks;
 
-  /// Default selection options for subtitles and audio tracks.
   final ModernPlayerDefaultSelectionOptions? defaultSelectionOptions;
 
-  // Modern player options gives you some basic controls for video
   final ModernPlayerOptions? options;
 
-  /// Modern player controls option.
   final ModernPlayerControlsOptions? controlsOptions;
 
-  /// Control theme of controls.
   final ModernPlayerThemeOptions? themeOptions;
 
-  /// With [translationOptions] option you can give translated text or custom to menu item.
   final ModernPlayerTranslationOptions? translationOptions;
 
-  /// With [callbackOptions] option you can perform custom actions on callback.
   final ModernPlayerCallbackOptions? callbackOptions;
 
   static Widget createPlayer(
@@ -117,7 +102,6 @@ class _ModernPlayerState extends State<ModernPlayer> {
 
     selectedQuality = defaultSource;
 
-    // Network
     if (defaultSource.sourceType == ModernPlayerSourceType.network) {
       _playerController = VlcPlayerController.network(defaultSource.source,
           autoPlay: true,
@@ -126,14 +110,10 @@ class _ModernPlayerState extends State<ModernPlayer> {
           options: VlcPlayerOptions(
             subtitle: VlcSubtitleOptions([VlcSubtitleOptions.color(VlcSubtitleColor.white)]),
           ));
-    }
-    // File
-    else if (defaultSource.sourceType == ModernPlayerSourceType.file) {
+    } else if (defaultSource.sourceType == ModernPlayerSourceType.file) {
       _playerController =
           VlcPlayerController.file(File(defaultSource.source), autoPlay: true, autoInitialize: true, hwAcc: HwAcc.auto);
-    }
-    // Youtube
-    else if (defaultSource.sourceType == ModernPlayerSourceType.youtube) {
+    } else if (defaultSource.sourceType == ModernPlayerSourceType.youtube) {
       var yt = YoutubeExplode();
       youtubeId = defaultSource.source;
       StreamManifest manifest = await yt.videos.streamsClient.getManifest(youtubeId);
@@ -171,9 +151,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
       }
 
       yt.close();
-    }
-    // Asset
-    else {
+    } else {
       _playerController =
           VlcPlayerController.asset(defaultSource.source, autoPlay: true, autoInitialize: true, hwAcc: HwAcc.full);
     }
@@ -186,7 +164,6 @@ class _ModernPlayerState extends State<ModernPlayer> {
     });
   }
 
-  /// Helper function to set default track for subtitle, audio, etc
   ModernPlayerVideoData? _getDefaultTrackSource(
       {required List<DefaultSelector>? selectors, required List<ModernPlayerVideoData>? trackEntries}) {
     if (selectors == null || trackEntries == null || trackEntries.isEmpty) {
@@ -206,7 +183,6 @@ class _ModernPlayerState extends State<ModernPlayer> {
 
           if (selected != null) {
             return selected;
-            // Else, if no track is found, loop to the next selector
           }
         case DefaultSelectorOff():
           return null;
@@ -237,7 +213,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
         if (await File(subtitle.source).exists()) {
           _playerController.addSubtitleFromFile(File(subtitle.source), isSelected: subtitle.isSelected);
         } else {
-          throw Exception("${subtitle.source} is not exist in local file.");
+          throw Exception('${subtitle.source} is not exist in local file.');
         }
       } else {
         _playerController.addSubtitleFromNetwork(subtitle.source, isSelected: subtitle.isSelected);
@@ -251,7 +227,7 @@ class _ModernPlayerState extends State<ModernPlayer> {
         if (await File(audio.source).exists()) {
           _playerController.addAudioFromFile(File(audio.source), isSelected: audio.isSelected);
         } else {
-          throw Exception("${audio.source} is not exist in local file.");
+          throw Exception('${audio.source} is not exist in local file.');
         }
       } else {
         _playerController.addAudioFromNetwork(audio.source, isSelected: audio.isSelected);
@@ -327,10 +303,13 @@ class _ModernPlayerState extends State<ModernPlayer> {
                   defaultSelectionOptions: widget.defaultSelectionOptions ?? ModernPlayerDefaultSelectionOptions(),
                   themeOptions: widget.themeOptions ?? ModernPlayerThemeOptions(),
                   translationOptions: widget.translationOptions ?? ModernPlayerTranslationOptions.menu(),
-                  viewSize: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height),
+                  viewSize: Size(
+                    MediaQuery.of(context).size.width,
+                    MediaQuery.of(context).size.height,
+                  ),
                   callbackOptions: widget.callbackOptions ?? ModernPlayerCallbackOptions(),
                   selectedQuality: selectedQuality,
-                )
+                ),
             ],
           )
         : Center(
